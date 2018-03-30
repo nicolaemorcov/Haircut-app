@@ -23,6 +23,8 @@ public class DBObjectManager implements DBObjectManagerInterface {
 		
 		// get the configuration from hibernate.cfg.xml and create configuration object 
 	    cfg = new Configuration().configure();
+	    
+	    createMasterDBFactory();
 	}
 	
 	//	create create master db factory

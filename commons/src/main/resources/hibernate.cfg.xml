@@ -5,16 +5,16 @@
 
 <hibernate-configuration>
 
-	<session-factory name="myFactory">
+	<session-factory>
 	
 		<!-- SQL Dialect -->
 		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 		
 		<!-- Database Connection Settings -->
 		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-		<property name="connection.url">jdbc:mysql://127.0.0.1:3306/haircut_db</property>
-		<property name="connection.username">student</property>
-		<property name="connection.password">student</property>
+		<property name="connection.url">jdbc:mysql://127.0.0.1:3306/haircut_app</property>
+		<property name="connection.username">kolia</property>
+		<property name="connection.password">kolia750</property>
 
 		<!-- Connection Pool Size (built-in) -->
 		<property name="connection.pool.size">1</property>
@@ -29,7 +29,8 @@
 		<!-- each pojo class represents a table in db -->
 			
 		<!-- Mention here all the model classes along with their package name -->
-		<mapping class="com.commons.entities.Person" />
+		<mapping class="com.commons.entities.User" />
+		<mapping class="com.commons.entities.Booking"/>
 	</session-factory>
 
 </hibernate-configuration>  

@@ -3,6 +3,7 @@ package com.commons.manager.objectmanagers;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
@@ -47,8 +48,10 @@ public class DataAccessObject implements ObjectManagerContext {
 		if(!appManager.isDatabaseDisabled()
 				&& masterSession == null) {
 			
-			// create a session which is a fisical connectio with the database
-			masterSession = dbObjectManager.getMasterDBFactory().openSession();
+			// create a session which is a fisical connection with the database
+			masterSession = dbObjectManager
+					.getMasterDBFactory()
+					.openSession();
 			
 			//begin a transaction. the beginTransaction() method will create a new transaction if there is none
 			transaction = masterSession.beginTransaction();
@@ -57,9 +60,9 @@ public class DataAccessObject implements ObjectManagerContext {
 	
 	private void masterCommit() {
 		if(masterSession != null) {
-			masterSession.close();
-			
 			transaction.commit();
+			
+			masterSession.close();
 			
 			masterSession = null;
 		}
@@ -88,6 +91,11 @@ public class DataAccessObject implements ObjectManagerContext {
 
 	public void persist(Object o) {
 	    getMasterSession().persist(o);
+	    getMasterSession().close();
+	    System.out.println("successfully saved"); 
+	}
+	public void delete(Object o) {
+	    getMasterSession().delete(o);
 	    masterCommit();
 	    System.out.println("successfully saved"); 
 	}
@@ -105,7 +113,8 @@ public class DataAccessObject implements ObjectManagerContext {
 		startTransaction();
 		
 		//create the query object
-		TypedQuery<E> query = createQuery(sql, entityClass);
+//		TypedQuery<E> query = createQuery(sql, entityClass);
+		TypedQuery<E> query = createQuery(sql);//kolia==========================================
 		
 		//get all the parameters and populate the sql query
 		int i = 0;
@@ -131,11 +140,19 @@ public class DataAccessObject implements ObjectManagerContext {
 	}
 
 	// check whether it is a named query or just query and return it to the caller
-	private <E extends Object> TypedQuery<E> createQuery(String sql, Class<E> entityClass) {
+	public <E extends Object> TypedQuery<E> createQuery(String sql, Class<E> entityClass) {
 		if(isNamedQuery(sql)) {
 			return masterSession.createNamedQuery(sql, entityClass);
 		} else {
 			return masterSession.createQuery(sql, entityClass);
+		}
+	}
+	
+	public <E extends Object> TypedQuery<E> createQuery(String sql) {
+		if(isNamedQuery(sql)) {
+			return masterSession.createNamedQuery(sql);
+		} else {
+			return masterSession.createQuery(sql);
 		}
 	}
 
@@ -154,8 +171,41 @@ public class DataAccessObject implements ObjectManagerContext {
 		
 	}
 
+	
 	public <E> List<E> getResultList(Class<E> entityClass, String sql, Object... args) {
-		// TODO Auto-generated method stub
-		return null;
+		startTransaction();
+		
+		//create the query object
+		TypedQuery<E> query = createQuery(sql);// kolia deleted entityClASS
+		
+		//get all the parameters and populate the sql query
+		int i = 0;
+		while(i < args.length) {
+			Object paramName = args[i];
+			++i;
+			Object value = args[i];
+			++i;
+			
+			try {
+				int position = Integer.parseInt((String) paramName);
+				
+				log.info(position + "=" + value);
+				
+				query.setParameter(position, value);
+			}
+			catch(NumberFormatException e) {
+				query.setParameter((String) paramName, value);
+			}
+		}
+		
+		return query.getResultList();
 	}
+	
+	public void executeQuery(Query query) {
+		query.executeUpdate();
+		getMasterSession().close();
+		}
+
+
+	
 }

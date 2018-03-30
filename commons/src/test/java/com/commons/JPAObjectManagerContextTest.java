@@ -4,35 +4,32 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Properties;
+import java.util.List;
+import java.util.Properties;import javax.persistence.Query;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.commons.entities.Booking;
 import com.commons.entities.Customer;
 import com.commons.entities.User;
 import com.commons.manager.ApplicationManagerContext;
 import com.commons.manager.objectmanagers.DBObjectManager;
 import com.commons.manager.objectmanagers.DataAccessObject;
+import com.commons.manager.objectmanagers.ObjectManagerContext;
+import com.commons.service.BookingService;
 import com.commons.service.UserService;
 
 public class JPAObjectManagerContextTest {
 
 	ApplicationManagerContext appManager;
 	DBObjectManager dbManager;
-	DataAccessObject objectManager;
+	ObjectManagerContext objectManager;
+	UserService us;
 	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -49,29 +46,109 @@ public class JPAObjectManagerContextTest {
 		dbManager = null;
 		objectManager = null;
 	}
+//	@Test
+//	@Ignore
+//	public void deleteBooking() {
+//		BookingService bs = new BookingService(objectManager);
+//		List<Booking> bookings = bs.getAllBookings();
+//		for(int i = 0 ;i < bookings.size(); i++) {
+//			Booking b = bookings.get(i);
+//			objectManager.delete(b);
+//		}
+		
+		
+//	}
+	
+	
+//	
+	@Test
+	@Ignore
+	public void deleteUserByEmailTest() {
+		UserService service = new UserService(objectManager);
+		User user = service.findUserByEmail("ionrovcom@gmail.com");
+		service.deleteUser(user);
+		System.out.println("User deleted");
+	}
 	
 	@Test
+	@Ignore
+	public void deleteBookingByCustId() {
+		BookingService bs = new BookingService(objectManager);
+		List<Booking> bookings = bs.findAllBookingsById(19);
+		
+		for (int i = 0; i < bookings.size(); i++) {
+			Booking b = bookings.get(i);
+			bs.deleteBooking(b);
+		}
+		System.out.println("Booking deleted");
+	}
+	
+	
+	
+	@Test
+	@Ignore
 	public void findUserByEmailTest() {
 		UserService us = new UserService(objectManager);
 		
 		System.out.println("searching for user");
-		User p = us.findUserByEmail("o@m.com");
-		
-		System.out.println(p.getEmail() + ",  " + p.getFirstName());
+		User user = us.findUserByEmail("galea88@gmail.com");
+		System.out.println(user.getEmail() + ",  " + user.getFirstName());
 	}
-
+	
+	//===========Kolia=============
+	@Test
+	@Ignore
+	public void findBookingByIdTest() {
+		BookingService bs = new BookingService(objectManager);
+		
+		System.out.println("searching for booking");
+		List<Booking> bookings = bs.findAllBookingsById(20);
+		for (int i = 0; i < bookings.size(); i++) {
+			Booking b = bookings.get(i);
+			System.out.println(b.getCustomerId() + ", " + b.getDateDue() + ", " + b.getBookingPrice());
+			
+		}
+	}
+	
+//	=============KOLIA===============================
+	@Test
+	@Ignore
+	public void findUserByIdTest() {
+		UserService service = new UserService(objectManager);
+		System.out.println("searching for user");
+		User user = service.findUserById(13);
+		System.out.println(user.getFirstName() + ", " + user.getLastName());
+	
+	}
+	
 	@Test
 	@Ignore
 	public void createCustomerTest()  {
-		Customer c1;
+		User c1;
 		try {
 			System.out.println("saving the object");
-			c1 = new Customer("Jim", "x8", "Jim", "Button", "j@b.com", "27/05/1956");
+			c1 = new User("Jklm", "iokkk999", "Jimmy", "Todesky", "jt@rmk.com", "12/6/1982");
 
 			dbManager.createMasterDBFactory();
 			objectManager.persist(c1);
 			System.out.println("saved to db...");
 		} catch (ParseException e) {
+			System.out.println(e);
+		}
+	}
+	
+//	=============Kolia==========================
+	@Test
+	@Ignore
+	public void createBookingTest() {
+		Booking b1;
+		try {
+			System.out.println("saving the object");
+			b1 = new Booking(112, 22, "30/03/2018", "12:00", 13.00);
+			dbManager.createMasterDBFactory();
+			objectManager.persist(b1);
+			System.out.println("booking saved to db...");
+		}catch (ParseException e) {
 			System.out.println(e);
 		}
 	}
@@ -93,6 +170,34 @@ public class JPAObjectManagerContextTest {
 		}
 		System.out.println("temp test");
 	}
+	
+	
+	@Test
+	@Ignore
+	public void updateUserFirstNameTest() {
+		UserService service = new UserService(objectManager);
+		System.out.println("searching for user");
+		User user = service.findUserByEmail("jt@rmk.com");
+		user.setFirstName("Jimmy");
+		service.updateFirstName(user);
+		System.out.println("User updated....");
+	} 
+	
+	@Test
+//	@Ignore
+	public void changeDateTimeTest() {
+		BookingService bs = new BookingService(objectManager);
+		try {
+			System.out.println("searching for booking");
+			Booking booking = bs.findBookingById(22);
+			booking.setDateDue("3/04/2018");
+			booking.setBookingTime("15:40");
+			bs.changeDateTime(booking);
+		}catch (ParseException e) {
+			System.out.println(e);
+		}
+	} 
+	
 	
 //	@Test
 //	public void tempTest() {

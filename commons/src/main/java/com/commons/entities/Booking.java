@@ -1,74 +1,157 @@
 package com.commons.entities;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.commons.service.ServiceEntity;
+@Table(name="booking")
+@Entity
 public class Booking {
-	private Long bookingId;
-	private ServiceEntity serviceId;
-	private final Date registeredOn = new Date();
-	private Date date = new Date();
-	private Long customerId;
-	private Long barberId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name="booking_id")
+	private int bookingId;
+	
+	@Column(name="service_id")
+	private int serviceId;
+	
+	@Column(name="customer_id")
+	private int customerId;
+	
+	@Column(name = "date_booked")
+	private String dateBooked;
+	
+	@Column(name = "date_due")
+	private Timestamp dateDue;
+	
+	@Column(name="booking_time")
+	private String bookingTime;
+	
+	@Column(name="booking_price")
 	private double bookingPrice;
 	
-	public Booking(Long bookingId, ServiceEntity serviceId, Date date, Long customerId, Long barberId) {
-		super();
-		this.bookingId = bookingId;
-		this.serviceId = serviceId;
-		this.date = date;
-		this.customerId = customerId;
-		this.barberId = barberId;
-	}
+	public Booking(){}
 	
-	// generated (protected, final)
-	//getters
-	protected final Long getBookingId() {
-		return bookingId;
-	}
-	protected final ServiceEntity getServiceId() {
-		return serviceId;
-	}
-	protected final Date getDate() {
-		return date;
+
+	
+	/**
+	 * @param bookingId
+	 * @param serviceId
+	 * @param customerId
+	 * @param dateBooked
+	 * @param dateDue
+	 * @param bookingPrice
+	 */
+	public Booking(int serviceId, int customerId, String dateDue,
+			String bookingTime, double bookingPrice) throws ParseException{
+		this.setServiceId(serviceId);
+		this.setCustomerId(customerId);
+		this.setDateBooked(dateBooked);
+		this.setDateDue(dateDue);
+		this.setBookingPrice(bookingPrice);
+		this.setBookingTime(bookingTime);
 	}
 
-	public long getCustomerId() {
+
+
+	// generated (protected, final)
+	//getters
+	int getBookingId() {
+		return bookingId;
+	}
+	int getServiceId() {
+		return serviceId;
+	}
+	public String getDateBooked() {
+		return dateBooked;
+	}
+
+	public Timestamp getDateDue() {
+		return dateDue;
+	}
+	
+	public String getBookingTime() {
+		return bookingTime;
+	}
+
+	public int getCustomerId() {
 		return customerId;
 	}
 	public double getBookingPrice() {
 		return bookingPrice;
 	}
 
-	public void setCustomerId(long customerId) {
+	public void setCustomerId(int customerId) {
 		this.customerId = customerId;
 	}
 
-	public long getBarberId() {
-		return barberId;
-	}
+//	public long getBarberId() {
+//		return barberId;
+//	}
+//
+//	public void setBarberId(int barberId) {
+//		this.barberId = barberId;
+//	}
 
-	public void setBarberId(long barberId) {
-		this.barberId = barberId;
-	}
-
-	protected final Date getRegisteredOn() {
-		return registeredOn;
-	}
 	
 	//setters
-	protected final void setServiceId(ServiceEntity serviceId) {
+	protected void setServiceId(int serviceId) {
 		this.serviceId = serviceId;
 	}
-	protected final void setDate(Date date) {
-		this.date = date;
-	}
 	
-	protected final void setBookingId(Long bookingId) {
-		this.bookingId = bookingId;
-	}
+//	protected void setDateBooked() {
+//		Date dNow = new Date( );
+//	      SimpleDateFormat ft = 
+//	      new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
+//	      this.dateBooked = ft.format(dNow);
+//		
+//	}
 	
-	protected final void settBookingPrice(double bookingPrice) {
+	
+
+//	protected void setBookingId(int bookingId) {
+//		this.bookingId = bookingId;
+//	}
+	
+	protected void calculateBookingPrice(double bookingPrice) {
 		this.bookingPrice = bookingPrice;
+	}
+
+
+
+	public void setDateBooked(String dateBooked)throws ParseException {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+		LocalDate localDate = LocalDate.now();
+		this.dateBooked = dtf.format(localDate); //2016/11/16
+	}
+
+
+
+	public void setDateDue(String dateDue) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy");
+		this.dateDue = new Timestamp(sdf.parse(dateDue).getTime());
+	}
+
+
+
+	public void setBookingPrice(double bookingPrice) {
+		this.bookingPrice = bookingPrice;
+	}
+	
+	public void setBookingTime(String bookingTime) {
+		this.bookingTime = bookingTime;
 	}
 
 	

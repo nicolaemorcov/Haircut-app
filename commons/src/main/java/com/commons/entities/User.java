@@ -17,7 +17,8 @@ import javax.persistence.Table;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@Column(name = "user_id")
+	private int id;
 	private String username;
 	private String password;
 	
@@ -25,9 +26,10 @@ public class User {
 	private String firstName;
 	@Column(name = "last_name")
 	private String lastName;
+	@Column(name = "email")
 	private String email;
 	
-	@Column(name = "date_of_birth")
+	@Column(name = "dob")
 	private Timestamp dob;
 	
 	public User() {}

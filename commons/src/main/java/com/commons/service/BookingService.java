@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Query;
+
 import com.commons.entities.Booking;
+import com.commons.entities.User;
 import com.commons.manager.objectmanagers.DataAccessObject;
+import com.commons.manager.objectmanagers.ObjectManagerContext;
 
 public class BookingService {
+	protected ObjectManagerContext oc;
 	DataAccessObject dao;
 	ShopService services;
 	
@@ -15,37 +20,79 @@ public class BookingService {
 	// there will be database available
 	List<Booking> allBookings = new ArrayList<Booking>();
 	
-	public BookingService(DataAccessObject dao) {
-		this.services = new ShopService();
+	public BookingService(ObjectManagerContext oc) {
+		this.oc = oc;
 		
 		
 	}
 	
 	public void createBooking(Booking booking) {
-		dao.persist(booking);
+		oc.persist(booking);
 		System.out.println("Create booking");
 	}
 	
-	public void deleteBooking() {
-		System.out.println("cancel booking");
+	//==============================kolia==========================================================
+	public void deleteBooking(Booking booking) {
+		String query = "DELETE FROM Booking b WHERE b.customerId = :customerIdVariable";
+		
+		Query q = oc.createQuery(query)
+				.setParameter("customerIdVariable", booking.getCustomerId());
+		oc.executeQuery(q);
 	}
+	
+	public void changeDateTime(Booking booking) {
+		String sql = "UPDATE Booking b SET b.dateDue = :dateDue, b.bookingTime = :time WHERE "
+				+ " b.customerId = :customerIdVar";
+		
+		Query q = oc.createQuery(sql)
+				.setParameter("dateDue", booking.getDateDue())
+				.setParameter("customerIdVar", booking.getCustomerId())
+				.setParameter("time", booking.getBookingTime());
+		oc.executeQuery(q);
+		
+	}
+	
+	public void changeCustomer(Booking booking) {
+		String sql = "UPDATE Booking b SET b.customerId = :customerId  WHERE "+ 
+				" b.customerId = :customerIdVar";
+		
+		Query q = oc.createQuery(sql)
+				.setParameter("customerId", booking.getCustomerId());
+		oc.executeQuery(q);
+	}
+	
+	
+	
+//	===============Kolia=========================
+	public List<Booking> findAllBookingsById(int id){
+//		User user = new User();
+		String query = "FROM Booking b WHERE b.customerId = :customerIdVariable";
+		
+		//create query
+		List<Booking> bookings = oc.getResultList(Booking.class, query, "customerIdVariable", id);
+		return bookings;
+	}
+	
+//	====================kolia===============================================
+	public Booking findBookingById(int id){
+//		User user = new User();
+		String query = "FROM Booking b WHERE b.customerId = :customerIdVariable";
+		
+		//create query
+		Booking booking = oc.getSingleResult(Booking.class, query, "customerIdVariable", id);
+		return booking;
+	}
+//	
 	
 	public void updateBooking() {
 		System.out.println("update booking");
 	}
+
 	
 	public List<Booking> getAllBookings() {
-		//will be removed when db available
-		ServiceEntity se1 = services.getAllServices().get(0);
-		ServiceEntity se2 = services.getAllServices().get(1);
+//		===============Kolia==========================
 		
-		//will be removed all db available
-		Booking b1 = new Booking(221l, se1, new Date(30032018), 331l, 441l);
-		Booking b2 = new Booking(223l, se2, new Date(1042018), 332l, 442l);
-		
-		allBookings.add(b1);
-		allBookings.add(b2);
-		
+
 		return allBookings;
 	}
 }
